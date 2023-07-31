@@ -1,0 +1,42 @@
+services:
+  async-app:
+    build: async-app
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+    expose:
+      - "80"
+
+  proxy:
+    image: nginx:1.25.1-bookworm
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+    configs:
+      - source: nginx-conf
+        target: /etc/nginx/nginx.conf
+        mode: 0440
+    secrets:
+      - source: certificate
+        target: /cert/localhost.pem
+        mode: 0440
+      - source: certificate_key
+        target: /cert/localhost-key.pem
+        mode: 0440
+
+configs:
+  nginx-conf:
+    file: "./default.conf"
+
+secrets:
+  certificate:
+    file: ./localhost.pem
+  certificate_key:
+    file: ./localhost-key.pem

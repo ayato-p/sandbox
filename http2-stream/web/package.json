@@ -1,0 +1,20 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lit": "^2.7.6",
+    "oboe": "^2.1.5"
+  },
+  "devDependencies": {
+    "@types/oboe": "^2.1.1",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
+  }
+}

@@ -1,0 +1,7 @@
+STORAGE: NONE
+RESTRICTION: || (== net7.0) (== netstandard2.0) (== netstandard2.1)
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    FSharp.Control.TaskSeq (0.3)
+      FSharp.Core (>= 6.0.2) - restriction: || (== net7.0) (&& (== netstandard2.0) (>= netstandard2.1)) (== netstandard2.1)
+    FSharp.Core (7.0.300) - restriction: || (== net7.0) (&& (== netstandard2.0) (>= netstandard2.1)) (== netstandard2.1)
