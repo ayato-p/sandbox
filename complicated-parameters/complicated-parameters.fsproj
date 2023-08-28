@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>complicated_parameters</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Driver.fs" />
+    <Compile Include="Controller.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>
