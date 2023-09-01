@@ -4,6 +4,11 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Driver.fs" />
+    <Compile Include="Port.fs" />
+    <Compile Include="Domain.fs" />
+    <Compile Include="Gateway.fs" />
+    <Compile Include="Controller.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
