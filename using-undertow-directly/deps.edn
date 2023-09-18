@@ -1,0 +1,5 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/core.async {:mvn/version "1.6.681"}
+        io.undertow/undertow-core {:mvn/version "2.1.0.Final"}
+        manifold/manifold {:mvn/version "0.4.1"}
+        org.clj-commons/byte-streams {:mvn/version "0.3.4"}}}
