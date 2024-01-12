@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: postgres:16.1-bullseye
+        imagePullPolicy: Always
+        ports:
+          - name: db-port
+            containerPort: 5432
+        volumeMounts:
+          - mountPath: /docker-entrypoint-initdb.d
+            name: init
+          - mountPath: /data/sql
+            name: sql
+        env:
+          - name: POSTGRES_PASSWORD
+            value: postgres
+        startupProbe:
+          exec:
+            command:
+              - psql
+              - -U
+              - {{ .Values.user }}
+              - -d
+              - {{ .Values.database }}
+              - -c
+              - "select 1"
+          failureThreshold: 30
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+              - pg_isready
+              - -U
+              - {{ .Values.user }}
+              - -d
+              - {{ .Values.database }}
+      volumes:
+      - name: init
+        configMap:
+          name: {{ .Values.configname.init }}
+          defaultMode: 0755
+      - name: sql
+        configMap:
+          name: {{ .Values.configname.sql }}
+          defaultMode: 0755

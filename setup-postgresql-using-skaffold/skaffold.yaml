@@ -1,0 +1,22 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: postgresql-test
+manifests:
+  helm:
+    releases:
+      - name: test-db-init-data
+        chartPath: data
+      - name: test-db
+        chartPath: postgresql
+        setValues:
+          name: test-db
+          port: "5433"
+          user: acmeuser
+          database: acme
+          configname: 
+            init: test-db-init
+            sql: test-db-sql
+deploy:
+  kubectl: 
+    defaultNamespace: test
