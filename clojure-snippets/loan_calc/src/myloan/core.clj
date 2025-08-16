@@ -1,6 +1,6 @@
 (ns myloan.core)
 
-(def total 100000000M)
+(def total 30000000M)
 
 (def rate (/ 0.5M 100))
 
