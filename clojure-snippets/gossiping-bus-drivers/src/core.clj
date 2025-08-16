@@ -13,28 +13,30 @@
   (nth routes (mod n (count routes))))
 
 (defn simulate' [{:keys [t drivers] :as state}]
-  (letfn [(drivers-at-stop [s]
+  (letfn [(drivers-at-stop [drivers s]
             (filter #(= s (stop (:routes %) t)) drivers))
           (merge-gossips [driver others]
-            (->> (map :gossips others)
-                 (apply set/union)
-                 (assoc driver :gossips)))]
-    (let [drivers (map (fn [{:keys [routes] :as driver}]
-                         (->> (drivers-at-stop (stop routes t))
-                              (merge-gossips driver)))
+            (->> (mapcat :gossips others)
+                 (update driver :gossips into)))]
+    (let [drivers (map #(->> (drivers-at-stop drivers (stop (:routes %) t))
+                             (merge-gossips %))
                        drivers)]
       {:drivers drivers
-       :all-drivers-known-all-gossips? (every? #(= (count drivers) (count (:gossips %))) drivers)
        :t t})))
 
 (defn simulate [[{:keys [routes] :as driver} :as drivers]]
   (let [drivers (->> drivers
-                     (map-indexed #(assoc %2 :gossips #{%1})))]
+                     (map-indexed #(assoc %2 :gossips #{%1})))
+        all-drivers-known-all-gossips?
+        (fn [{:keys [drivers]}]
+          (every? #(= (count drivers)
+                      (count (:gossips %)))
+                  drivers))]
     (or (->> (simulate' {:t 0 :drivers drivers})
              (iterate #(-> % (update :t inc) simulate'))
              #_(map #(do (clojure.pprint/pprint %) %))
              (take 480)
-             (filter :all-drivers-known-all-gossips?)
+             (filter all-drivers-known-all-gossips?)
              first
              :t)
         :never)))
@@ -62,4 +64,10 @@
   (t/is (= 4
            (simulate [{:routes [:c :a :b :c]}
                       {:routes [:c :b :c :a]}
-                      {:routes [:d :b :c :d :e]}]))))
+                      {:routes [:d :b :c :d :e]}])))
+
+  (t/is (= 56
+           (simulate [{:routes [0 1 2 3 4 5 6 7 8 9 10]}
+                      {:routes [2 3 1]}
+                      {:routes [9 8 8]}
+                      {:routes [12 11 10]}]))))
