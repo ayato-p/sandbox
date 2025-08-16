@@ -14,8 +14,9 @@
 (defn simulate [[{:keys [routes]} :as drivers]]
   (let [seq-of-routes (map :routes drivers)]
     (letfn [(next [{:keys [t]}]
-              {:stops (stops seq-of-routes t)
-               :t (inc t)})]
+              (let [t' (inc t)]
+                {:stops (stops seq-of-routes t')
+                 :t t'}))]
       (or (->> (iterate next {:t 0 :stops (stops seq-of-routes 0)})
                (take 480)
                (filter (comp #(apply = %) :stops))
@@ -31,11 +32,14 @@
     :x [:x :y] 4))
 
 (t/deftest simulate-test
-  (t/is (match? :never
-                (simulate [{:routes [:x]}
-                           {:routes [:y]}])))
+  (t/is (= :never
+           (simulate [{:routes [:x]}
+                      {:routes [:y]}])))
 
-  (t/is (match? 0
-                (simulate [{:routes [:x]}
-                           {:routes [:x]}]))))
+  (t/is (= 0
+           (simulate [{:routes [:x]}
+                      {:routes [:x]}])))
 
+  (t/is (= 3
+           (simulate [{:routes [:x :y]}
+                      {:routes [:y :x :z]}]))))
