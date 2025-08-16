@@ -11,18 +11,23 @@
 (defn stops [seq-of-routes n]
   (map #(stop % n) seq-of-routes))
 
-(defn simulate [[{:keys [routes]} :as drivers]]
+(defn simulator [drivers]
   (let [seq-of-routes (map :routes drivers)]
-    (letfn [(next [{:keys [t]}]
-              (let [t' (inc t)]
-                {:stops (stops seq-of-routes t')
-                 :t t'}))]
-      (or (->> (iterate next {:t 0 :stops (stops seq-of-routes 0)})
-               (take 480)
-               (filter (comp #(apply = %) :stops))
-               first
-               :t)
-          :never))))
+    (fn simulate' [{:keys [t drivers] :as state}]
+      (let [current-stops (stops seq-of-routes t)]
+        {:drivers drivers
+         :all-drivers-known-all-gossips? (apply = current-stops)
+         :t t}))))
+
+(defn simulate [[{:keys [routes]} :as drivers]]
+  (let [simulate' (simulator drivers)]
+    (or (->> (simulate' {:t 0})
+             (iterate (comp simulate' #(update % :t inc)))
+             (take 480)
+             (filter :all-drivers-known-all-gossips?)
+             first
+             :t)
+        :never)))
 
 (t/deftest stop-test
   (t/are [expected routes n] (= expected (stop routes n))
@@ -42,4 +47,9 @@
 
   (t/is (= 3
            (simulate [{:routes [:x :y]}
-                      {:routes [:y :x :z]}]))))
+                      {:routes [:y :x :z]}])))
+
+  (t/is (= 5
+           (simulate [{:routes [:c :a :b :c]}
+                      {:routes [:c :b :c :a]}
+                      {:routes [:d :b :c :d :e]}]))))
