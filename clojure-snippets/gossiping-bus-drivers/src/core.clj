@@ -1,28 +1,38 @@
 (ns core
   (:refer-clojure :exclude [next])
-  (:require [clojure.test :as t]
-            [matcher-combinators.clj-test]))
+  (:require
+   [clojure.set :as set]
+   [clojure.test :as t]
+   [matcher-combinators.clj-test]))
+
+;; c.f. https://kata-log.rocks/gossiping-bus-drivers-kata
 
 (defn stop [routes n]
   {:pre [(<= 0 n)
          (pos? (count routes))]}
   (nth routes (mod n (count routes))))
 
-(defn stops [seq-of-routes n]
-  (map #(stop % n) seq-of-routes))
+(defn simulate' [{:keys [t drivers] :as state}]
+  (letfn [(drivers-at-stop [s]
+            (filter #(= s (stop (:routes %) t)) drivers))
+          (merge-gossips [driver others]
+            (->> (map :gossips others)
+                 (apply set/union)
+                 (assoc driver :gossips)))]
+    (let [drivers (map (fn [{:keys [routes] :as driver}]
+                         (->> (drivers-at-stop (stop routes t))
+                              (merge-gossips driver)))
+                       drivers)]
+      {:drivers drivers
+       :all-drivers-known-all-gossips? (every? #(= (count drivers) (count (:gossips %))) drivers)
+       :t t})))
 
-(defn simulator [drivers]
-  (let [seq-of-routes (map :routes drivers)]
-    (fn simulate' [{:keys [t drivers] :as state}]
-      (let [current-stops (stops seq-of-routes t)]
-        {:drivers drivers
-         :all-drivers-known-all-gossips? (apply = current-stops)
-         :t t}))))
-
-(defn simulate [[{:keys [routes]} :as drivers]]
-  (let [simulate' (simulator drivers)]
-    (or (->> (simulate' {:t 0})
-             (iterate (comp simulate' #(update % :t inc)))
+(defn simulate [[{:keys [routes] :as driver} :as drivers]]
+  (let [drivers (->> drivers
+                     (map-indexed #(assoc %2 :gossips #{%1})))]
+    (or (->> (simulate' {:t 0 :drivers drivers})
+             (iterate #(-> % (update :t inc) simulate'))
+             #_(map #(do (clojure.pprint/pprint %) %))
              (take 480)
              (filter :all-drivers-known-all-gossips?)
              first
@@ -49,7 +59,7 @@
            (simulate [{:routes [:x :y]}
                       {:routes [:y :x :z]}])))
 
-  (t/is (= 5
+  (t/is (= 4
            (simulate [{:routes [:c :a :b :c]}
                       {:routes [:c :b :c :a]}
                       {:routes [:d :b :c :d :e]}]))))
