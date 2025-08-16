@@ -1,6 +1,7 @@
 {:aliases
  {:loan-calc
-  {:paths ["loan_calc/src"]}}
+  {:paths ["loan_calc/src"]}
 
- :gossiping-bus-drivers
- {:paths ["gossiping-bus-drivers/src"]}}
+  :gossiping-bus-drivers
+  {:paths ["gossiping-bus-drivers/src"]
+   :deps {nubank/matcher-combinators {:mvn/version "3.9.1"}}}}}
