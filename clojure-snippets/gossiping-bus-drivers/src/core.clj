@@ -1,11 +1,9 @@
 (ns core
+  "c.f. https://kata-log.rocks/gossiping-bus-drivers-kata"
   (:refer-clojure :exclude [next])
   (:require
-   [clojure.set :as set]
    [clojure.test :as t]
    [matcher-combinators.clj-test]))
-
-;; c.f. https://kata-log.rocks/gossiping-bus-drivers-kata
 
 (defn stop [routes n]
   {:pre [(<= 0 n)
@@ -13,16 +11,16 @@
   (nth routes (mod n (count routes))))
 
 (defn simulate' [{:keys [t drivers] :as state}]
-  (letfn [(drivers-at-stop [drivers s]
+  (letfn [(drivers-at-stop [s]
             (filter #(= s (stop (:routes %) t)) drivers))
           (merge-gossips [driver others]
             (->> (mapcat :gossips others)
-                 (update driver :gossips into)))]
-    (let [drivers (map #(->> (drivers-at-stop drivers (stop (:routes %) t))
-                             (merge-gossips %))
-                       drivers)]
-      {:drivers drivers
-       :t t})))
+                 (update driver :gossips into)))
+          (next [drivers]
+            (map #(->> (drivers-at-stop (stop (:routes %) t))
+                       (merge-gossips %))
+                 drivers))]
+    (update state :drivers next)))
 
 (defn simulate [[{:keys [routes] :as driver} :as drivers]]
   (let [drivers (->> drivers
@@ -36,7 +34,7 @@
              (iterate #(-> % (update :t inc) simulate'))
              #_(map #(do (clojure.pprint/pprint %) %))
              (take 480)
-             (filter all-drivers-known-all-gossips?)
+             (drop-while (complement all-drivers-known-all-gossips?))
              first
              :t)
         :never)))
@@ -71,3 +69,4 @@
                       {:routes [2 3 1]}
                       {:routes [9 8 8]}
                       {:routes [12 11 10]}]))))
+
