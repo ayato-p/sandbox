@@ -5,4 +5,5 @@
                           :deps {nubank/matcher-combinators {:mvn/version "3.9.1"}}}
 
   :building-tree-graph {:paths ["building-tree-graph/src"]
-                        :deps {nubank/matcher-combinators {:mvn/version "3.9.1"}}}}}
+                        :deps {nubank/matcher-combinators {:mvn/version "3.9.1"}}}
+  :design-patterns {:paths ["design-patterns/src"]}}}
