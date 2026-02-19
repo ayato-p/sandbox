@@ -1,12 +1,6 @@
 package com.uzabase.calendar;
 
-public class Year {
-    private final int value;
-
-    public Year(int value) {
-        this.value = value;
-    }
-
+public record Year(int value) {
     public boolean isOlympicYear() {
         if (this.value < 1896) return false;
         return (this.value % 4) == 0;
