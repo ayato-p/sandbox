@@ -8,7 +8,7 @@ public record Year(int value) {
 
     public boolean isLeapYear() {
         if ((this.value % 4) != 0) return false;
-        if ((this.value % 100) == 0) return true;
+        if ((this.value % 100) != 0) return true;
         return (this.value % 400) == 0;
     }
 }
