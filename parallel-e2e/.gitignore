@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+dist/
+
+# Environment
+.env
+.env.*
+
+# Maven / Java
+target/
+
+# Gauge
+.gauge/
+reports/
+logs/
+
+# OS
+.DS_Store
+*.log

@@ -1,0 +1,31 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: demo-api
+build:
+  artifacts:
+    - image: demo-api
+      context: ../../
+      docker:
+        dockerfile: environments/demo-api/app/Dockerfile
+manifests:
+  helm:
+    releases:
+      - name: demo-api
+        chartPath: app/helm
+        setValues:
+          image.repository: demo-api
+  rawYaml:
+    - wiremock/deployment.yaml
+    - wiremock/service.yaml
+deploy:
+  kubectl: {}
+portForward:
+  - resourceType: service
+    resourceName: demo-api
+    port: 80
+    localPort: 3000
+  - resourceType: service
+    resourceName: wiremock
+    port: 8080
+    localPort: 8080
