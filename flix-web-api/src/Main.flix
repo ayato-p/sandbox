@@ -10,8 +10,7 @@ def main(): Unit \ IO =
     let pingHandler = new HttpHandler {
         def handle(_this: HttpHandler, exchange: HttpExchange): Unit \ IO =
             if (exchange.getRequestMethod() == "GET")
-                let body = "pong";
-                let bytes = body.getBytes(StandardCharsets.UTF_8);
+                let bytes = "pong".getBytes(StandardCharsets.UTF_8);
 
                 exchange.getResponseHeaders().set(
                     "Content-Type",

@@ -1,0 +1,37 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: helidon-payment-demo
+  labels:
+    app: helidon-payment-demo
+spec:
+  type: ClusterIP
+  selector:
+    app: helidon-payment-demo
+  ports:
+    - name: tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: helidon-payment-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helidon-payment-demo
+  template:
+    metadata:
+      labels:
+        app: helidon-payment-demo
+        version: v1
+    spec:
+      containers:
+      - name: helidon-payment-demo
+        image: helidon-payment-demo
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
